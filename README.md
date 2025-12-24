@@ -1,0 +1,1 @@
+ Extracts structured data from Italian rental contracts using AI, generates payment schedules, and provides multi-language dashboard. Tech: Next.js 14, TypeScript, Node.js, OpenAI API, Supabase, Tailwind CSS, AWS Lambda.
