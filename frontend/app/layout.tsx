@@ -1,21 +1,13 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import { i18n } from "@/i18n/config";
 
-export const metadata: Metadata = {
-  title: "Contract Automation System",
-  description: "Sedes rental contract automation and analysis platform",
-};
+export function generateStaticParams() {
+  return i18n.locales.map((locale) => ({ locale }));
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <body className="antialiased">
-        {children}
-      </body>
-    </html>
-  );
+}) {
+  return children;
 }

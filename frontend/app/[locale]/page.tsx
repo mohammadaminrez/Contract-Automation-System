@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { FileUpload } from "@/components/FileUpload";
 import { ContractList } from "@/components/ContractList";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function Home() {
+  const t = useTranslations('home');
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleUploadSuccess = () => {
@@ -17,12 +20,17 @@ export default function Home() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <header className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            Contract Automation System
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Upload and analyze rental contracts with automated data extraction
-          </p>
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                {t('title')}
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300">
+                {t('subtitle')}
+              </p>
+            </div>
+            <LanguageSwitcher />
+          </div>
         </header>
 
         {/* Upload Section */}
@@ -33,7 +41,7 @@ export default function Home() {
         {/* Contract List Section */}
         <section>
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-            Recent Contracts
+            {t('recentContracts')}
           </h2>
           <ContractList key={refreshKey} />
         </section>

@@ -1,0 +1,85 @@
+{
+  "home": {
+    "title": "Sistema di Automazione Contratti",
+    "subtitle": "Carica e analizza contratti di locazione con estrazione dati automatizzata",
+    "uploadSection": "Carica Contratto",
+    "recentContracts": "Contratti Recenti"
+  },
+  "upload": {
+    "title": "Carica Contratto",
+    "chooseFile": "Scegli un file",
+    "dragAndDrop": "o trascina e rilascia",
+    "fileTypes": "Documenti PDF o Word fino a 10MB",
+    "uploading": "Caricamento in corso...",
+    "analyzing": "Analisi del contratto in corso...",
+    "uploadAndAnalyze": "Carica e Analizza",
+    "success": "Contratto caricato e analizzato con successo!",
+    "error": {
+      "invalidType": "Carica un documento PDF o Word (.pdf, .doc, .docx)",
+      "tooLarge": "La dimensione del file deve essere inferiore a 10MB",
+      "selectFile": "Seleziona prima un file"
+    }
+  },
+  "contractList": {
+    "loading": "Caricamento contratti...",
+    "noContracts": "Nessun contratto caricato",
+    "uploadFirst": "Carica il tuo primo contratto per iniziare",
+    "fileName": "Nome File",
+    "status": "Stato",
+    "confidence": "Confidenza",
+    "uploaded": "Caricato",
+    "actions": "Azioni",
+    "view": "Visualizza"
+  },
+  "contractDetail": {
+    "backToContracts": "Torna ai Contratti",
+    "deleteContract": "Elimina Contratto",
+    "deleting": "Eliminazione...",
+    "confirmDelete": "Sei sicuro di voler eliminare questo contratto? Questa azione non può essere annullata.",
+    "loading": "Caricamento dettagli contratto...",
+    "notFound": "Contratto Non Trovato",
+    "backToHome": "Torna alla Home",
+    "status": "Stato",
+    "confidence": "Confidenza",
+    "uploaded": "Caricato",
+    "analyzedOn": "Analizzato il",
+    "extractedData": "Dati Estratti dal Contratto",
+    "paymentSchedules": "Opzioni di Pagamento",
+    "installmentPlan": "Piano Rateale",
+    "singlePayment": "Pagamento Unico",
+    "save": "Risparmio di",
+    "discount": "di sconto",
+    "fields": {
+      "guestName": "Nome Ospite",
+      "guestBirthDate": "Data di Nascita",
+      "guestBirthPlace": "Luogo di Nascita",
+      "guestTaxCode": "Codice Fiscale",
+      "residenceType": "Tipo di Residenza",
+      "roomNumber": "Numero Camera",
+      "startDate": "Data Inizio",
+      "endDate": "Data Fine",
+      "totalRent": "Retta Totale",
+      "monthlyRent": "Retta Mensile",
+      "securityDeposit": "Deposito Cauzionale",
+      "installment1Amount": "Importo 1° Rata",
+      "installment1Date": "Data 1° Rata",
+      "installment2Date": "Data 2° Rata",
+      "installment3Date": "Data 3° Rata"
+    },
+    "table": {
+      "installment": "#",
+      "description": "Descrizione",
+      "amount": "Importo",
+      "dueDate": "Scadenza"
+    }
+  },
+  "status": {
+    "pending": "In Attesa",
+    "analyzing": "In Analisi",
+    "completed": "Completato",
+    "error": "Errore"
+  },
+  "common": {
+    "na": "N/D"
+  }
+}
