@@ -48,6 +48,35 @@ export default function ContractDetailPage() {
     }
   };
 
+  const handleExportJSON = () => {
+    if (!contract) return;
+
+    // Create a clean JSON object with all contract data
+    const exportData = {
+      file_name: contract.file_name,
+      status: contract.status,
+      uploaded_at: contract.uploaded_at,
+      analyzed_at: contract.analyzed_at,
+      extraction_confidence: contract.extraction_confidence,
+      extracted_data: contract.extracted_data,
+      payment_schedules: contract.payment_schedules,
+    };
+
+    // Convert to JSON string with pretty formatting
+    const jsonString = JSON.stringify(exportData, null, 2);
+
+    // Create a blob and download it
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${contract.file_name.replace(/\.[^/.]+$/, '')}_export.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
@@ -118,13 +147,35 @@ export default function ContractDetailPage() {
             Back to Contracts
           </button>
 
-          <button
-            onClick={handleDelete}
-            disabled={deleting}
-            className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:cursor-not-allowed"
-          >
-            {deleting ? 'Deleting...' : 'Delete Contract'}
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={handleExportJSON}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+            >
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
+              </svg>
+              Export JSON
+            </button>
+
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:cursor-not-allowed"
+            >
+              {deleting ? 'Deleting...' : 'Delete Contract'}
+            </button>
+          </div>
         </div>
 
         {/* Contract Info Card */}
@@ -169,16 +220,19 @@ export default function ContractDetailPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <DataField label="Guest Name" value={contract.extracted_data.guest_name} />
-              <DataField label="Guest Birth Date" value={contract.extracted_data.guest_birth_date} />
-              <DataField label="Guest Birth Place" value={contract.extracted_data.guest_birth_place} />
-              <DataField label="Guest Tax Code" value={contract.extracted_data.guest_tax_code} />
-              <DataField label="Residence Type" value={contract.extracted_data.residence_type} />
-              <DataField label="Room Number" value={contract.extracted_data.room_number} />
+              <DataField label="Birth Date" value={contract.extracted_data.birth_date} />
+              <DataField label="Birth Place" value={contract.extracted_data.birth_place} />
+              <DataField label="Fiscal Code" value={contract.extracted_data.fiscal_code} />
+              <DataField label="Residence City" value={contract.extracted_data.residence_city} />
+              <DataField label="Residence Address" value={contract.extracted_data.residence_address} />
+              <DataField label="Accommodation Address" value={contract.extracted_data.accommodation_address} />
+              <DataField label="University" value={contract.extracted_data.university} />
+              <DataField label="Academic Year" value={contract.extracted_data.academic_year} />
               <DataField label="Start Date" value={contract.extracted_data.start_date} />
               <DataField label="End Date" value={contract.extracted_data.end_date} />
               <DataField label="Total Rent" value={formatCurrency(contract.extracted_data.rent_total)} />
-              <DataField label="Monthly Rent" value={formatCurrency(contract.extracted_data.monthly_rent)} />
               <DataField label="Security Deposit" value={formatCurrency(contract.extracted_data.security_deposit)} />
+              <DataField label="Number of Installments" value={contract.extracted_data.number_of_installments} />
               <DataField label="1st Installment Amount" value={formatCurrency(contract.extracted_data.installment_1_amount)} />
               <DataField label="1st Installment Date" value={contract.extracted_data.installment_1_date} />
               <DataField label="2nd Installment Date" value={contract.extracted_data.installment_2_date} />
