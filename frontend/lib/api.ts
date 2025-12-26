@@ -2,6 +2,49 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
+export interface ExtractedData {
+  // Personal Information
+  guest_name?: string;
+  guest_email?: string;
+  guest_phone?: string;
+  birth_date?: string;
+  birth_place?: string;
+  fiscal_code?: string;
+  residence_city?: string;
+  residence_address?: string;
+
+  // Property Information
+  accommodation_address?: string;
+
+  // Educational Information
+  university?: string;
+  academic_year?: string;
+
+  // Contract Dates
+  start_date?: string;
+  end_date?: string;
+
+  // Financial Information
+  rent_total?: number;
+  monthly_rent?: number;
+  security_deposit?: number;
+  number_of_installments?: number;
+  installment_1_amount?: number;
+  installment_1_date?: string;
+  installment_2_amount?: number;
+  installment_2_date?: string;
+  installment_3_amount?: number;
+  installment_3_date?: string;
+
+  // Other
+  contract_type?: string;
+  provider?: string;
+  utilities_included?: boolean;
+  payment_method?: string;
+
+  [key: string]: any;
+}
+
 export interface Contract {
   id: string;
   file_name: string;
@@ -10,7 +53,7 @@ export interface Contract {
   file_size: number | null;
   original_text: string | null;
   is_analyzed: boolean;
-  extracted_data: any;
+  extracted_data: ExtractedData | null;
   payment_schedules: any[] | null;
   status: 'pending' | 'analyzing' | 'completed' | 'error';
   extraction_confidence: number | null;
@@ -44,8 +87,8 @@ export const api = {
   /**
    * Analyze a contract
    */
-  async analyzeContract(contractId: string): Promise<Contract> {
-    const response = await fetch(`${API_BASE_URL}/api/contracts/${contractId}/analyze`, {
+  async analyzeContract(contractId: string, method: 'regex' | 'openai' = 'regex'): Promise<Contract> {
+    const response = await fetch(`${API_BASE_URL}/api/contracts/${contractId}/analyze?method=${method}`, {
       method: 'POST',
     });
 

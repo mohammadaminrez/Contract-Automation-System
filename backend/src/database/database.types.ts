@@ -19,16 +19,45 @@ export interface Contract {
 }
 
 export interface ExtractedData {
+  // Personal Information
   guest_name?: string;
   guest_email?: string;
   guest_phone?: string;
+  birth_date?: string;
+  birth_place?: string;
+  fiscal_code?: string;
+  residence_city?: string;
+  residence_address?: string;
+
+  // Property Information
   accommodation_address?: string;
-  rent_total?: number;
+
+  // Educational Information
+  university?: string;
+  academic_year?: string;
+
+  // Contract Dates
   start_date?: string;
   end_date?: string;
+
+  // Financial Information
+  rent_total?: number;
+  monthly_rent?: number;
   security_deposit?: number;
+  number_of_installments?: number;
+  installment_1_amount?: number;
+  installment_1_date?: string;
+  installment_2_amount?: number;
+  installment_2_date?: string;
+  installment_3_amount?: number;
+  installment_3_date?: string;
+
+  // Other
+  contract_type?: string;
+  provider?: string;
   utilities_included?: boolean;
   payment_method?: string;
+
   [key: string]: any; // Allow additional fields
 }
 

@@ -13,6 +13,7 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [extractionMethod, setExtractionMethod] = useState<'regex' | 'openai'>('regex');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,11 +53,11 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
       // Step 1: Upload file
       const uploadedContract = await api.uploadContract(file);
 
-      // Step 2: Analyze contract
+      // Step 2: Analyze contract with selected extraction method
       setUploading(false);
       setAnalyzing(true);
 
-      await api.analyzeContract(uploadedContract.id);
+      await api.analyzeContract(uploadedContract.id, extractionMethod);
 
       // Success
       setAnalyzing(false);
@@ -226,6 +227,51 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
           </p>
         </div>
       )}
+
+      {/* Extraction Method Toggle */}
+      <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          Extraction Method
+        </label>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <label className="flex items-center cursor-pointer flex-1">
+            <input
+              type="radio"
+              value="regex"
+              checked={extractionMethod === 'regex'}
+              onChange={(e) => setExtractionMethod(e.target.value as 'regex' | 'openai')}
+              disabled={uploading || analyzing}
+              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+            />
+            <div className="flex-1">
+              <span className="text-sm font-medium text-gray-900 dark:text-white">
+                Regex (Pattern-based)
+              </span>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Fast extraction for Italian Unicampus contracts only
+              </p>
+            </div>
+          </label>
+          <label className="flex items-center cursor-pointer flex-1">
+            <input
+              type="radio"
+              value="openai"
+              checked={extractionMethod === 'openai'}
+              onChange={(e) => setExtractionMethod(e.target.value as 'regex' | 'openai')}
+              disabled={uploading || analyzing}
+              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+            />
+            <div className="flex-1">
+              <span className="text-sm font-medium text-gray-900 dark:text-white">
+                OpenAI (AI-powered) ⭐
+              </span>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Works with ANY rental document in any language
+              </p>
+            </div>
+          </label>
+        </div>
+      </div>
 
       {/* Upload Button */}
       <button

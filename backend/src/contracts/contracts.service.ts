@@ -2,6 +2,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { TextExtractionService } from '../extraction/text-extraction.service';
 import { UnicampusExtractionService } from '../extraction/unicampus-extraction.service';
+import { OpenAIExtractionService } from '../extraction/openai-extraction.service';
 import { PaymentScheduleService } from '../payment/payment-schedule.service';
 import { Contract } from '../database/database.types';
 import * as fs from 'fs/promises';
@@ -14,6 +15,7 @@ export class ContractsService {
     private readonly supabaseService: SupabaseService,
     private readonly textExtractionService: TextExtractionService,
     private readonly unicampusExtractionService: UnicampusExtractionService,
+    private readonly openaiExtractionService: OpenAIExtractionService,
     private readonly paymentScheduleService: PaymentScheduleService,
   ) {}
 
@@ -52,8 +54,8 @@ export class ContractsService {
   /**
    * Analyze a contract (extract text + extract data + generate payment schedules)
    */
-  async analyzeContract(contractId: string): Promise<Contract> {
-    this.logger.log(`Analyzing contract: ${contractId}`);
+  async analyzeContract(contractId: string, extractionMethod: 'regex' | 'openai' = 'regex'): Promise<Contract> {
+    this.logger.log(`Analyzing contract: ${contractId} with method: ${extractionMethod}`);
 
     // Get contract from database
     const { data: contract, error: fetchError } =
@@ -81,10 +83,11 @@ export class ContractsService {
       const cleanedText =
         this.textExtractionService.cleanText(extractionResult.text);
 
-      // Step 2: Extract structured data using Unicampus patterns
-      this.logger.log('Step 2: Extracting structured data');
-      const unicampusResult =
-        await this.unicampusExtractionService.extractContractData(cleanedText);
+      // Step 2: Extract structured data using selected method
+      this.logger.log(`Step 2: Extracting structured data using ${extractionMethod}`);
+      const unicampusResult = extractionMethod === 'openai'
+        ? await this.openaiExtractionService.extractContractData(cleanedText)
+        : await this.unicampusExtractionService.extractContractData(cleanedText);
 
       // Step 3: Generate payment schedules
       this.logger.log('Step 3: Generating payment schedules');

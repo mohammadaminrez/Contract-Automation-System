@@ -232,11 +232,6 @@ export default function ContractDetailPage() {
               <DataField label="End Date" value={contract.extracted_data.end_date} />
               <DataField label="Total Rent" value={formatCurrency(contract.extracted_data.rent_total)} />
               <DataField label="Security Deposit" value={formatCurrency(contract.extracted_data.security_deposit)} />
-              <DataField label="Number of Installments" value={contract.extracted_data.number_of_installments} />
-              <DataField label="1st Installment Amount" value={formatCurrency(contract.extracted_data.installment_1_amount)} />
-              <DataField label="1st Installment Date" value={contract.extracted_data.installment_1_date} />
-              <DataField label="2nd Installment Date" value={contract.extracted_data.installment_2_date} />
-              <DataField label="3rd Installment Date" value={contract.extracted_data.installment_3_date} />
             </div>
           </div>
         )}
@@ -342,7 +337,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function DataField({ label, value }: { label: string; value: string | number | null }) {
+function DataField({ label, value }: { label: string; value: string | number | null | undefined }) {
   return (
     <div>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{label}</p>
@@ -353,7 +348,7 @@ function DataField({ label, value }: { label: string; value: string | number | n
   );
 }
 
-function formatCurrency(value: number | null): string {
+function formatCurrency(value: number | null | undefined): string {
   if (value === null || value === undefined) return 'N/A';
   return `€${value.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }

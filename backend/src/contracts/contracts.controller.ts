@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiConsumes } from '@nestjs/swagger';
@@ -80,8 +81,12 @@ export class ContractsController {
     type: AnalyzeContractResponseDto,
   })
   @HttpCode(HttpStatus.OK)
-  async analyzeContract(@Param('id') id: string) {
-    return this.contractsService.analyzeContract(id);
+  async analyzeContract(
+    @Param('id') id: string,
+    @Query('method') method?: 'regex' | 'openai',
+  ) {
+    const extractionMethod = method || 'regex';
+    return this.contractsService.analyzeContract(id, extractionMethod);
   }
 
   @Get()
