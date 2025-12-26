@@ -18,7 +18,7 @@ import { ContractsService } from './contracts.service';
 import { AnalyzeContractResponseDto } from './dto/analyze-contract.dto';
 
 @ApiTags('contracts')
-@Controller('api/contracts')
+@Controller('contracts')
 export class ContractsController {
   constructor(private readonly contractsService: ContractsService) {}
 

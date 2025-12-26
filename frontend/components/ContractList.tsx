@@ -1,9 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { api, Contract } from "@/lib/api";
 
 export function ContractList() {
+  const params = useParams();
+  const router = useRouter();
+  const locale = params.locale as string;
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -141,8 +145,7 @@ export function ContractList() {
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => {
-                      // TODO: Navigate to contract detail page (Task 8)
-                      window.location.href = `/contracts/${contract.id}`;
+                      router.push(`/${locale}/contracts/${contract.id}`);
                     }}
                     className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
                   >
