@@ -6,7 +6,11 @@ A full-stack web application that automates the extraction and analysis of renta
 
 ## Overview
 
-This system allows users to upload rental contracts (PDF or Word documents) and automatically extracts key information such as tenant details, financial terms, payment schedules, and contract dates. It supports two extraction methods: fast regex-based pattern matching for Italian Unicampus contracts, and AI-powered universal extraction for any rental document in any language.
+This system allows users to upload rental contracts (PDF or Word documents) and automatically extracts key information.
+
+It supports two extraction methods: 
+
+Fast regex-based pattern matching for Italian Unicampus contracts, and AI-powered universal extraction for any rental document in any language.
 
 ## Features
 
@@ -14,8 +18,6 @@ This system allows users to upload rental contracts (PDF or Word documents) and 
 - **Dual Extraction Methods**:
   - **Regex**: Fast pattern-based extraction for Italian Unicampus contracts
   - **OpenAI**: AI-powered extraction for any rental document in any language
-- **Data Extraction**: Automatically extracts tenant info, financial details, dates, and more
-- **Payment Schedule Generation**: Creates structured payment plans from contract data
 - **JSON Export**: Export extracted data in JSON format
 - **Multi-language Support**: English and Italian interface (i18n)
 - **Dark Mode**: Built-in theme switching
@@ -50,7 +52,6 @@ This system allows users to upload rental contracts (PDF or Word documents) and 
 - **Deployment**: Docker, Docker Compose, Render.com
 - **Version Control**: Git/GitHub
 
-
 ## API Endpoints
 
 ### Contracts
@@ -68,91 +69,51 @@ This system allows users to upload rental contracts (PDF or Word documents) and 
 
 ---
 
-## GDPR Compliance for OpenAI Integration
+## GDPR Compliance & Privacy
 
-This system processes sensitive personal data from rental contracts (names, fiscal codes, addresses, financial details) and sends it to OpenAI's GPT-4o-mini API when using AI extraction.
+**Issue:** System processes personal data (names, fiscal codes, addresses) and sends it to OpenAI without consent tracking or GDPR safeguards.
 
-### Legal Basis & Consent
+**Key requirements:**
+- Add consent checkbox before upload + store consent records
+- Display privacy notice when OpenAI extraction is selected
+- Sign Data Processing Agreement with OpenAI (or use Azure OpenAI for EU data residency)
+- Implement 90-day auto-deletion policy with cron job
+- Add audit logs for all data access
+- Optional: PII redaction (replace fiscal codes/emails with placeholders before sending to OpenAI)
 
-**Current gap:** No consent tracking or legal basis documentation.
+---
 
-**Required changes:**
-- Add consent checkbox during upload confirming users have the right to process the data and agree to AI analysis
-- Store consent records with timestamps and IP addresses in the database
-- For B2B use cases, document "legitimate interests" as the legal basis in a Data Protection Impact Assessment (DPIA)
+## System Design — Production Considerations
 
-### User Control & Transparency
+### Multi-Client Support
 
-**Missing features:**
-- Users can't withdraw consent after uploading
-- No information about what happens when data goes to OpenAI
-- Can't switch between extraction methods after upload
+Extend to multi-tenant architecture:
+- Add `clients` and `users` tables
+- Scope all queries by `client_id` for data isolation
+- Implement JWT auth + role-based access (admin, manager, viewer)
 
-**Needed implementations:**
-- "Delete my data" button that removes both database records and uploaded files
-- Clear modal when selecting OpenAI: "This sends contract text to OpenAI servers in the USA. Data is encrypted in transit, not used for training, and deleted after 30 days."
-- Privacy policy update mentioning OpenAI as sub-processor, data transfers to USA, retention periods, and user rights
-- Audit trail logging all consent decisions
+### Automation Opportunities
 
-### GDPR Data Subject Rights
+- AI validation layer for inconsistent data
+- Email reminders before payment due dates
+- Human-in-the-loop review for low-confidence extractions
+- Auto-categorize contracts by type
 
-**Right to Access:** Already supported via JSON export button
+### Risks & Mitigations
 
-**Right to Erasure:** Delete endpoint works for local data, but can't force OpenAI deletion (their API auto-deletes after 30 days anyway)
+**AI hallucinations:** OpenAI may extract incorrect rent amounts or dates. Mitigate with user confirmation workflows and confidence score thresholds that flag uncertain extractions for manual review.
 
-**Right to Rectification:** Need to add ability to edit extracted data after processing
+**Financial errors:** Payment schedules could have wrong percentages or totals. Add validation rules ensuring installments sum to 100% and match the total rent amount.
 
-**Right to Data Portability:** Already works through JSON export
+**Scaling issues:** Large PDFs or high concurrent load can cause timeouts. Implement async job queues (Redis + Bull) to process extractions in the background without blocking user requests.
 
-**Right to Object:** Users can choose regex-only extraction to avoid AI processing
+**Data leakage:** Sending personal data to OpenAI risks GDPR violations. Use PII redaction (replace fiscal codes/emails with placeholders before API calls) or switch to Azure OpenAI EU region for data residency compliance.
 
-### Age Verification
+**Cost overruns:** Heavy OpenAI API usage can get expensive. Implement rate limiting per user and monthly quotas based on subscription tiers to control costs.
 
-For student housing contracts, implement one of:
-- Checkbox confirming no minors under 16 are involved
-- Auto-detect birth dates indicating minors and flag for review
-- Parental consent workflow for verified minors
+---
 
-Since this is B2B software (property managers, not tenants directly), age verification is lower priority but should be documented in terms of service.
+## References
 
-### OpenAI Data Processing Agreement
-
-**Critical step:** Sign OpenAI's DPA with Standard Contractual Clauses for legal data transfers to the USA.
-
-**Alternative:** Switch to Azure OpenAI Service for EU data residency. Azure OpenAI keeps all data within EU regions and offers better GDPR compliance tools. Requires changing the OpenAI client initialization in `openai-extraction.service.ts` to point to Azure endpoints.
-
-### Data Minimization & PII Redaction
-
-**Current issue:** Entire contract text goes to OpenAI, including potentially irrelevant sections.
-
-**Improvements needed:**
-- Pre-process documents to send only first 3 pages (usually contains all needed data)
-- Implement PII redaction before OpenAI: replace fiscal codes, emails, and names with placeholders like `FISCAL_1`, `EMAIL_1`, then restore them after extraction
-- This way OpenAI never sees actual personal identifiers while still extracting structured data
-
-**Purpose limitation:** Only use extracted data for contract management, not marketing or other purposes.
-
-### Data Protection Impact Assessment (DPIA)
-
-GDPR requires DPIA when using AI that processes personal data. Document:
-
-1. **Data processed:** Names, addresses, fiscal codes, financial data
-2. **Purpose:** Automate manual data entry, reduce errors
-3. **Risks:** Data breach at OpenAI, AI hallucinations, unauthorized file access
-4. **Mitigations:** TLS encryption, confidence scoring, access logs, 90-day retention, regex alternative
-5. **Residual risk:** Acceptable for business use with informed consent
-
-Keep this internally - you don't need to publish it, but have it ready if data protection authorities ask.
-
-### Retention & Auto-Deletion
-
-**Current state:** Contracts stored indefinitely.
-
-**GDPR requirement:** Implement automatic deletion after defined period.
-
-Add database fields for retention period (default 90 days) and scheduled deletion date. Run daily cron job to auto-delete expired contracts including both database records and uploaded files. Let clients configure retention based on their legal requirements (some need 1 year, others want 30 days).
-
-### Audit Logging
-
-Create audit log table tracking contract access. Log every view, export, download, and deletion with user ID, IP address, and timestamp. Required for demonstrating GDPR compliance during audits.
+- [ChatGPT Privacy Risks & GDPR Compliance](https://www.legalnodes.com/article/chatgpt-privacy-risks)
 
