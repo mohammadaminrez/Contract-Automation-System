@@ -70,7 +70,7 @@ This system allows users to upload rental contracts (PDF or Word documents) and 
 
 ## GDPR Compliance for OpenAI Integration
 
-This system processes sensitive personal data from rental contracts (names, fiscal codes, addresses, financial details) and sends it to OpenAI's GPT-4o-mini API when using AI extraction. Here's what needs to happen for GDPR compliance:
+This system processes sensitive personal data from rental contracts (names, fiscal codes, addresses, financial details) and sends it to OpenAI's GPT-4o-mini API when using AI extraction.
 
 ### Legal Basis & Consent
 
@@ -155,20 +155,4 @@ Add database fields for retention period (default 90 days) and scheduled deletio
 ### Audit Logging
 
 Create audit log table tracking contract access. Log every view, export, download, and deletion with user ID, IP address, and timestamp. Required for demonstrating GDPR compliance during audits.
-
-### Implementation Checklist
-
-- [ ] Add consent checkbox to upload form
-- [ ] Display privacy notice when OpenAI selected
-- [ ] Sign DPA with OpenAI or migrate to Azure OpenAI
-- [ ] Implement 90-day auto-deletion policy
-- [ ] Create audit log for all data access
-- [ ] Write privacy policy explaining OpenAI usage
-- [ ] Add user data deletion endpoint
-- [ ] Implement PII redaction before sending to OpenAI
-- [ ] Conduct and document DPIA
-- [ ] Set up data breach monitoring
-- [ ] Train users on GDPR requirements
-
-**Good news:** The system already uses HTTPS, Supabase has encryption, and OpenAI is reputable. Most changes are backend additions that don't require rebuilding the architecture. You're about 60% compliant already - just need consent tracking, transparency notices, and deletion workflows.
 
