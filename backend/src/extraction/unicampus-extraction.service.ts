@@ -42,8 +42,9 @@ export class UnicampusExtractionService {
     rawMatches.birthInfo = birthMatch;
     fieldScores.birthDate = birthDate ? 1 : 0;
 
-    // Extract fiscal code
-    const fiscalCodeMatch = text.match(/C\.F\.\s+([A-Z0-9]{16})/i);
+    // Extract fiscal code - get the guest's fiscal code (appears after "E: Il/La Sig./Sig.ra")
+    // Not the legal representative's code which appears first
+    const fiscalCodeMatch = text.match(/E:\s*Il\/La Sig\.\/Sig\.ra\s+[A-Z\s]+,\s+nato\/a\s+a\s+[A-Z\s]+\s+il\s+\d{2}\/\d{2}\/\d{4},\s+C\.F\.\s+([A-Z0-9]{16})/i);
     const fiscalCode = fiscalCodeMatch?.[1];
     rawMatches.fiscalCode = fiscalCodeMatch;
     fieldScores.fiscalCode = fiscalCode ? 1 : 0;
@@ -79,11 +80,16 @@ export class UnicampusExtractionService {
     rawMatches.installment2 = installment2Match;
     rawMatches.installment3 = installment3Match;
 
-    // Extract deposit (deposito cauzionale) - look for perdita di €250 pattern
+    // Extract monthly rent (use first installment amount as monthly rent)
+    const monthlyRent = installment1Match ? parseFloat(installment1Match[1]) : null;
+    rawMatches.monthlyRent = installment1Match;
+    fieldScores.monthlyRent = monthlyRent ? 1 : 0;
+
+    // Extract deposit (deposito cauzionale) - look for the actual deposit in Art. 7
     const depositMatch = text.match(
-      /perdita\s+di\s+€\s*([\d.,]+)/i
+      /deposito\s+cauzionale.*?(?:l'importo\s+di\s+)?euro?\s+([\d.,]+)/i
     );
-    const securityDeposit = depositMatch ? parseFloat(depositMatch[1].replace(',', '.')) : null;
+    const securityDeposit = depositMatch ? parseFloat(depositMatch[1].replace(/\./g, '').replace(',', '.')) : null;
     rawMatches.securityDeposit = depositMatch;
     fieldScores.securityDeposit = securityDeposit ? 1 : 0;
 
@@ -128,6 +134,7 @@ export class UnicampusExtractionService {
       residence_address: residenceAddress,
       accommodation_address: accommodationAddress || undefined,
       rent_total: rentTotal || undefined,
+      monthly_rent: monthlyRent || undefined,
       number_of_installments: numberOfInstallments || undefined,
       installment_1_amount: installment1Match ? parseFloat(installment1Match[1]) : undefined,
       installment_1_date: installment1Match?.[2],

@@ -94,15 +94,17 @@ export class ContractsService {
       let paymentSchedules = null;
 
       if (unicampusResult.data.rent_total && unicampusResult.data.start_date) {
+        // Extract installment data dynamically
+        const { numberOfInstallments, installmentDates, installmentAmounts } =
+          this.extractInstallmentData(unicampusResult.data);
+
         const scheduleResult =
           this.paymentScheduleService.generatePaymentSchedule(
             unicampusResult.data.rent_total,
             unicampusResult.data.start_date,
-            {
-              first: unicampusResult.data.installment_1_date,
-              second: unicampusResult.data.installment_2_date,
-              third: unicampusResult.data.installment_3_date,
-            },
+            numberOfInstallments,
+            installmentDates,
+            installmentAmounts,
           );
         paymentSchedules = scheduleResult.options;
       }
@@ -171,6 +173,52 @@ export class ContractsService {
     }
 
     return data as Contract;
+  }
+
+  /**
+   * Extract installment data dynamically from extracted data
+   */
+  private extractInstallmentData(extractedData: any): {
+    numberOfInstallments: number;
+    installmentDates: Record<number, string>;
+    installmentAmounts: Record<number, number>;
+  } {
+    const installmentDates: Record<number, string> = {};
+    const installmentAmounts: Record<number, number> = {};
+    let numberOfInstallments = extractedData.number_of_installments || 0;
+
+    // Scan for installment_N_amount and installment_N_date fields (support up to 10 installments)
+    let detectedInstallments = 0;
+    for (let i = 1; i <= 10; i++) {
+      const amountKey = `installment_${i}_amount`;
+      const dateKey = `installment_${i}_date`;
+
+      if (extractedData[amountKey] !== undefined && extractedData[amountKey] !== null) {
+        installmentAmounts[i] = extractedData[amountKey];
+        detectedInstallments = Math.max(detectedInstallments, i);
+      }
+
+      if (extractedData[dateKey] !== undefined && extractedData[dateKey] !== null) {
+        installmentDates[i] = extractedData[dateKey];
+        detectedInstallments = Math.max(detectedInstallments, i);
+      }
+    }
+
+    // If we detected installments but number_of_installments wasn't set, use detected count
+    if (detectedInstallments > 0 && numberOfInstallments === 0) {
+      numberOfInstallments = detectedInstallments;
+    }
+
+    // Default to 3 if nothing was found
+    if (numberOfInstallments === 0) {
+      numberOfInstallments = 3;
+    }
+
+    return {
+      numberOfInstallments,
+      installmentDates,
+      installmentAmounts,
+    };
   }
 
   /**

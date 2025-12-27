@@ -21,25 +21,29 @@ export class PaymentScheduleService {
 
   /**
    * Generate payment schedule options based on contract data
-   * Option 1: 3 installments (40%, 30%, 30%)
+   * Option 1: N installments (using extracted amounts or equal split)
    * Option 2: Single payment with 3% discount
    */
   generatePaymentSchedule(
     totalAmount: number,
     startDate: string,
-    installmentDates?: { first?: string; second?: string; third?: string },
+    numberOfInstallments: number,
+    installmentDates?: Record<number, string>,
+    extractedAmounts?: Record<number, number>,
   ): PaymentScheduleResult {
     this.logger.log(
-      `Generating payment schedule for total: €${totalAmount}`,
+      `Generating payment schedule for total: €${totalAmount} with ${numberOfInstallments} installments`,
     );
 
     const options: PaymentOption[] = [];
 
-    // Option 1: 3 installments (40%, 30%, 30%)
+    // Option 1: N installments (using extracted amounts if available)
     const installmentsOption = this.generateInstallmentsOption(
       totalAmount,
       startDate,
+      numberOfInstallments,
       installmentDates,
+      extractedAmounts,
     );
     options.push(installmentsOption);
 
@@ -61,30 +65,53 @@ export class PaymentScheduleService {
   }
 
   /**
-   * Generate 3 installments option (40%, 30%, 30%)
+   * Generate N installments option using extracted amounts from contract
    */
   private generateInstallmentsOption(
     totalAmount: number,
     startDate: string,
-    customDates?: { first?: string; second?: string; third?: string },
+    numberOfInstallments: number,
+    customDates?: Record<number, string>,
+    extractedAmounts?: Record<number, number>,
   ): PaymentOption {
-    const percentages = [40, 30, 30];
     const installments: PaymentSchedule[] = [];
 
-    let cumulativeAmount = 0;
+    // Build amounts array dynamically
+    const amounts: number[] = [];
+    let hasExtractedAmounts = false;
 
-    for (let i = 0; i < 3; i++) {
-      const percentage = percentages[i];
-      let amount: number;
-
-      // Last installment gets the remainder to avoid rounding issues
-      if (i === 2) {
-        amount = totalAmount - cumulativeAmount;
-      } else {
-        amount = Math.round((totalAmount * percentage) / 100 * 100) / 100;
-        cumulativeAmount += amount;
+    // Check if we have extracted amounts
+    if (extractedAmounts) {
+      for (let i = 0; i < numberOfInstallments; i++) {
+        if (extractedAmounts[i + 1] !== undefined && extractedAmounts[i + 1] !== null) {
+          amounts.push(extractedAmounts[i + 1]);
+          hasExtractedAmounts = true;
+        } else {
+          amounts.push(null);
+        }
       }
+    }
 
+    // If no extracted amounts, split equally
+    if (!hasExtractedAmounts) {
+      const equalAmount = Math.round((totalAmount / numberOfInstallments) * 100) / 100;
+      for (let i = 0; i < numberOfInstallments; i++) {
+        if (i === numberOfInstallments - 1) {
+          // Last installment gets the remainder to avoid rounding issues
+          const sumSoFar = equalAmount * (numberOfInstallments - 1);
+          amounts.push(totalAmount - sumSoFar);
+        } else {
+          amounts.push(equalAmount);
+        }
+      }
+    }
+
+    // Generate installment records
+    for (let i = 0; i < numberOfInstallments; i++) {
+      const amount = amounts[i];
+      if (!amount || amount <= 0) continue; // Skip invalid amounts
+
+      const percentage = Math.round((amount / totalAmount) * 100 * 100) / 100;
       const dueDate = this.calculateDueDate(i, startDate, customDates);
 
       installments.push({
@@ -92,7 +119,7 @@ export class PaymentScheduleService {
         amount,
         percentage,
         due_date: dueDate,
-        description: `${i + 1}° rata (${percentage}%)`,
+        description: `${i + 1}° rata`,
         payment_type: 'installment',
       });
     }
@@ -101,8 +128,7 @@ export class PaymentScheduleService {
       type: 'installments',
       total_amount: totalAmount,
       installments,
-      description:
-        'Pagamento rateale in 3 rate: 40%, 30%, 30% del totale',
+      description: `Pagamento rateale in ${installments.length} rate`,
     };
   }
 
@@ -142,25 +168,17 @@ export class PaymentScheduleService {
   private calculateDueDate(
     installmentIndex: number,
     startDate: string,
-    customDates?: { first?: string; second?: string; third?: string },
+    customDates?: Record<number, string>,
   ): string {
-    // If custom dates provided, use them
-    if (customDates) {
-      if (installmentIndex === 0 && customDates.first) {
-        return this.normalizeDate(customDates.first);
-      }
-      if (installmentIndex === 1 && customDates.second) {
-        return this.normalizeDate(customDates.second);
-      }
-      if (installmentIndex === 2 && customDates.third) {
-        return this.normalizeDate(customDates.third);
-      }
+    // If custom dates provided, use them (1-indexed)
+    if (customDates && customDates[installmentIndex + 1]) {
+      return this.normalizeDate(customDates[installmentIndex + 1]);
     }
 
     // Otherwise, calculate based on start date
     // 1st installment: at start
     // 2nd installment: +4 months
-    // 3rd installment: +8 months
+    // 3rd installment: +8 months, etc.
     const date = new Date(this.normalizeDate(startDate));
     const monthsToAdd = installmentIndex * 4;
     date.setMonth(date.getMonth() + monthsToAdd);

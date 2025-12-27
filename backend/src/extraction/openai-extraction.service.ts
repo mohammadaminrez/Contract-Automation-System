@@ -82,11 +82,23 @@ CRITICAL: Return a FLAT JSON object (NOT nested) with these exact field names at
   "number_of_installments": 3,
   "installment_1_amount": 4120,
   "installment_1_date": "first payment due date",
-  "installment_2_date": "second payment due date if exists",
-  "installment_3_date": "third payment due date if exists",
+  "installment_2_amount": 4120,
+  "installment_2_date": "second payment due date",
+  "installment_3_amount": 4120,
+  "installment_3_date": "third payment due date",
+  "installment_4_amount": null,
+  "installment_4_date": null,
   "contract_type": "type of contract",
   "provider": "landlord/company name"
 }
+
+IMPORTANT INSTALLMENT EXTRACTION RULES:
+- If the document has installment payments, extract ALL installment amounts AND dates
+- Number each installment sequentially: installment_1_amount, installment_2_amount, etc.
+- Always extract BOTH amount and date for each installment
+- Set number_of_installments to the actual count of installments found
+- Include installments up to installment_10 if they exist (support up to 10 installments)
+- Use null for installments that don't exist
 
 IMPORTANT:
 - Return a FLAT object with all fields at the root level
