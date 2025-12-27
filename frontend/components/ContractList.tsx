@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { api, Contract } from "@/lib/api";
 
 export function ContractList() {
+  const t = useTranslations();
   const params = useParams();
   const router = useRouter();
   const locale = params.locale as string;
@@ -23,7 +25,7 @@ export function ContractList() {
       const data = await api.getAllContracts();
       setContracts(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load contracts');
+      setError(err instanceof Error ? err.message : t('upload.error.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -33,7 +35,7 @@ export function ContractList() {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
         <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-600 border-r-transparent"></div>
-        <p className="mt-4 text-gray-600 dark:text-gray-400">Loading contracts...</p>
+        <p className="mt-4 text-gray-600 dark:text-gray-400">{t('contractList.loading')}</p>
       </div>
     );
   }
@@ -77,9 +79,9 @@ export function ContractList() {
             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
           />
         </svg>
-        <p className="text-gray-600 dark:text-gray-400">No contracts uploaded yet</p>
+        <p className="text-gray-600 dark:text-gray-400">{t('contractList.noContracts')}</p>
         <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
-          Upload your first contract to get started
+          {t('contractList.uploadFirst')}
         </p>
       </div>
     );
@@ -92,19 +94,19 @@ export function ContractList() {
           <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                File Name
+                {t('contractList.fileName')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Status
+                {t('contractList.status')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Confidence
+                {t('contractList.confidence')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Uploaded
+                {t('contractList.uploaded')}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Actions
+                {t('contractList.actions')}
               </th>
             </tr>
           </thead>
@@ -132,7 +134,7 @@ export function ContractList() {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <StatusBadge status={contract.status} />
+                  <StatusBadge status={contract.status} t={t} />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                   {contract.extraction_confidence !== null
@@ -149,7 +151,7 @@ export function ContractList() {
                     }}
                     className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
                   >
-                    View
+                    {t('contractList.view')}
                   </button>
                 </td>
               </tr>
@@ -161,7 +163,7 @@ export function ContractList() {
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, t }: { status: string; t: any }) {
   const styles = {
     pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
     analyzing: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
@@ -175,7 +177,7 @@ function StatusBadge({ status }: { status: string }) {
         styles[status as keyof typeof styles] || styles.pending
       }`}
     >
-      {status}
+      {t(`status.${status}`)}
     </span>
   );
 }

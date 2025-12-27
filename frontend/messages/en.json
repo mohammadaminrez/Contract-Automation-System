@@ -14,10 +14,19 @@
     "analyzing": "Analyzing contract...",
     "uploadAndAnalyze": "Upload and Analyze",
     "success": "Contract uploaded and analyzed successfully!",
+    "extractionMethod": "Extraction Method",
+    "regexMethod": "Regex (Pattern-based)",
+    "regexDescription": "Fast extraction for Italian Unicampus contracts only",
+    "openaiMethod": "OpenAI (AI-powered) ⭐",
+    "openaiDescription": "Works with ANY rental document in any language",
     "error": {
       "invalidType": "Please upload a PDF or Word document (.pdf, .doc, .docx)",
       "tooLarge": "File size must be less than 10MB",
-      "selectFile": "Please select a file first"
+      "selectFile": "Please select a file first",
+      "uploadFailed": "Failed to upload and analyze contract",
+      "loadFailed": "Failed to load contracts",
+      "deleteFailed": "Failed to delete contract",
+      "fetchFailed": "Failed to load contract"
     }
   },
   "contractList": {
@@ -39,9 +48,10 @@
     "loading": "Loading contract details...",
     "notFound": "Contract Not Found",
     "backToHome": "Back to Home",
-    "status": "Status",
-    "confidence": "Confidence",
-    "uploaded": "Uploaded",
+    "exportJson": "Export JSON",
+    "statusLabel": "Status",
+    "confidenceLabel": "Confidence",
+    "uploadedLabel": "Uploaded",
     "analyzedOn": "Analyzed on",
     "extractedData": "Extracted Contract Data",
     "paymentSchedules": "Payment Schedule Options",
@@ -51,16 +61,24 @@
     "discount": "discount",
     "fields": {
       "guestName": "Guest Name",
+      "birthDate": "Birth Date",
+      "birthPlace": "Birth Place",
+      "fiscalCode": "Fiscal Code",
+      "residenceCity": "Residence City",
+      "residenceAddress": "Residence Address",
+      "accommodationAddress": "Accommodation Address",
+      "university": "University",
+      "academicYear": "Academic Year",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "totalRent": "Total Rent",
+      "securityDeposit": "Security Deposit",
       "guestBirthDate": "Guest Birth Date",
       "guestBirthPlace": "Guest Birth Place",
       "guestTaxCode": "Guest Tax Code",
       "residenceType": "Residence Type",
       "roomNumber": "Room Number",
-      "startDate": "Start Date",
-      "endDate": "End Date",
-      "totalRent": "Total Rent",
       "monthlyRent": "Monthly Rent",
-      "securityDeposit": "Security Deposit",
       "installment1Amount": "1st Installment Amount",
       "installment1Date": "1st Installment Date",
       "installment2Date": "2nd Installment Date",
@@ -81,5 +99,9 @@
   },
   "common": {
     "na": "N/A"
+  },
+  "metadata": {
+    "title": "Contract Automation System",
+    "description": "Sedes rental contract automation and analysis platform"
   }
 }

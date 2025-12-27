@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { api } from "@/lib/api";
 
 interface FileUploadProps {
@@ -8,6 +9,7 @@ interface FileUploadProps {
 }
 
 export function FileUpload({ onUploadSuccess }: FileUploadProps) {
+  const t = useTranslations();
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
@@ -24,13 +26,13 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
       const fileExtension = '.' + selectedFile.name.split('.').pop()?.toLowerCase();
 
       if (!validTypes.includes(fileExtension)) {
-        setError('Please upload a PDF or Word document (.pdf, .doc, .docx)');
+        setError(t('upload.error.invalidType'));
         return;
       }
 
       // Validate file size (max 10MB)
       if (selectedFile.size > 10 * 1024 * 1024) {
-        setError('File size must be less than 10MB');
+        setError(t('upload.error.tooLarge'));
         return;
       }
 
@@ -42,7 +44,7 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
 
   const handleUpload = async () => {
     if (!file) {
-      setError('Please select a file first');
+      setError(t('upload.error.selectFile'));
       return;
     }
 
@@ -77,7 +79,7 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
     } catch (err) {
       setUploading(false);
       setAnalyzing(false);
-      setError(err instanceof Error ? err.message : 'Failed to upload and analyze contract');
+      setError(err instanceof Error ? err.message : t('upload.error.uploadFailed'));
     }
   };
 
@@ -97,12 +99,12 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
       const fileExtension = '.' + droppedFile.name.split('.').pop()?.toLowerCase();
 
       if (!validTypes.includes(fileExtension)) {
-        setError('Please upload a PDF or Word document (.pdf, .doc, .docx)');
+        setError(t('upload.error.invalidType'));
         return;
       }
 
       if (droppedFile.size > 10 * 1024 * 1024) {
-        setError('File size must be less than 10MB');
+        setError(t('upload.error.tooLarge'));
         return;
       }
 
@@ -115,7 +117,7 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
       <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-        Upload Contract
+        {t('upload.title')}
       </h2>
 
       {/* Drag and Drop Zone */}
@@ -142,7 +144,7 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
         <div className="mb-4">
           <label htmlFor="file-upload" className="cursor-pointer">
             <span className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 font-medium">
-              Choose a file
+              {t('upload.chooseFile')}
             </span>
             <input
               ref={fileInputRef}
@@ -155,11 +157,11 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
               disabled={uploading || analyzing}
             />
           </label>
-          <span className="text-gray-600 dark:text-gray-400"> or drag and drop</span>
+          <span className="text-gray-600 dark:text-gray-400">{t('upload.dragAndDrop')}</span>
         </div>
 
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          PDF or Word documents up to 10MB
+          {t('upload.fileTypes')}
         </p>
       </div>
 
@@ -223,7 +225,7 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
       {success && (
         <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
           <p className="text-sm text-green-600 dark:text-green-400">
-            Contract uploaded and analyzed successfully!
+            {t('upload.success')}
           </p>
         </div>
       )}
@@ -231,7 +233,7 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
       {/* Extraction Method Toggle */}
       <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-          Extraction Method
+          {t('upload.extractionMethod')}
         </label>
         <div className="flex flex-col sm:flex-row gap-3">
           <label className="flex items-center cursor-pointer flex-1">
@@ -245,10 +247,10 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
             />
             <div className="flex-1">
               <span className="text-sm font-medium text-gray-900 dark:text-white">
-                Regex (Pattern-based)
+                {t('upload.regexMethod')}
               </span>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Fast extraction for Italian Unicampus contracts only
+                {t('upload.regexDescription')}
               </p>
             </div>
           </label>
@@ -263,10 +265,10 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
             />
             <div className="flex-1">
               <span className="text-sm font-medium text-gray-900 dark:text-white">
-                OpenAI (AI-powered) ⭐
+                {t('upload.openaiMethod')}
               </span>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Works with ANY rental document in any language
+                {t('upload.openaiDescription')}
               </p>
             </div>
           </label>
@@ -279,9 +281,9 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
         disabled={!file || uploading || analyzing}
         className="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white font-medium py-3 px-4 rounded-lg transition-colors disabled:cursor-not-allowed"
       >
-        {uploading && 'Uploading...'}
-        {analyzing && 'Analyzing contract...'}
-        {!uploading && !analyzing && 'Upload and Analyze'}
+        {uploading && t('upload.uploading')}
+        {analyzing && t('upload.analyzing')}
+        {!uploading && !analyzing && t('upload.uploadAndAnalyze')}
       </button>
     </div>
   );

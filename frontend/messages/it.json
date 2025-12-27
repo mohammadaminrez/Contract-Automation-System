@@ -14,10 +14,19 @@
     "analyzing": "Analisi del contratto in corso...",
     "uploadAndAnalyze": "Carica e Analizza",
     "success": "Contratto caricato e analizzato con successo!",
+    "extractionMethod": "Metodo di Estrazione",
+    "regexMethod": "Regex (Pattern-based)",
+    "regexDescription": "Estrazione veloce solo per contratti Unicampus italiani",
+    "openaiMethod": "OpenAI (AI-powered) ⭐",
+    "openaiDescription": "Funziona con QUALSIASI documento di locazione in qualsiasi lingua",
     "error": {
       "invalidType": "Carica un documento PDF o Word (.pdf, .doc, .docx)",
       "tooLarge": "La dimensione del file deve essere inferiore a 10MB",
-      "selectFile": "Seleziona prima un file"
+      "selectFile": "Seleziona prima un file",
+      "uploadFailed": "Impossibile caricare e analizzare il contratto",
+      "loadFailed": "Impossibile caricare i contratti",
+      "deleteFailed": "Impossibile eliminare il contratto",
+      "fetchFailed": "Impossibile caricare il contratto"
     }
   },
   "contractList": {
@@ -39,9 +48,10 @@
     "loading": "Caricamento dettagli contratto...",
     "notFound": "Contratto Non Trovato",
     "backToHome": "Torna alla Home",
-    "status": "Stato",
-    "confidence": "Confidenza",
-    "uploaded": "Caricato",
+    "exportJson": "Esporta JSON",
+    "statusLabel": "Stato",
+    "confidenceLabel": "Confidenza",
+    "uploadedLabel": "Caricato",
     "analyzedOn": "Analizzato il",
     "extractedData": "Dati Estratti dal Contratto",
     "paymentSchedules": "Opzioni di Pagamento",
@@ -51,16 +61,24 @@
     "discount": "di sconto",
     "fields": {
       "guestName": "Nome Ospite",
+      "birthDate": "Data di Nascita",
+      "birthPlace": "Luogo di Nascita",
+      "fiscalCode": "Codice Fiscale",
+      "residenceCity": "Città di Residenza",
+      "residenceAddress": "Indirizzo di Residenza",
+      "accommodationAddress": "Indirizzo Alloggio",
+      "university": "Università",
+      "academicYear": "Anno Accademico",
+      "startDate": "Data Inizio",
+      "endDate": "Data Fine",
+      "totalRent": "Retta Totale",
+      "securityDeposit": "Deposito Cauzionale",
       "guestBirthDate": "Data di Nascita",
       "guestBirthPlace": "Luogo di Nascita",
       "guestTaxCode": "Codice Fiscale",
       "residenceType": "Tipo di Residenza",
       "roomNumber": "Numero Camera",
-      "startDate": "Data Inizio",
-      "endDate": "Data Fine",
-      "totalRent": "Retta Totale",
       "monthlyRent": "Retta Mensile",
-      "securityDeposit": "Deposito Cauzionale",
       "installment1Amount": "Importo 1° Rata",
       "installment1Date": "Data 1° Rata",
       "installment2Date": "Data 2° Rata",
@@ -81,5 +99,9 @@
   },
   "common": {
     "na": "N/D"
+  },
+  "metadata": {
+    "title": "Sistema di Automazione Contratti",
+    "description": "Piattaforma di automazione e analisi dei contratti di locazione Sedes"
   }
 }
